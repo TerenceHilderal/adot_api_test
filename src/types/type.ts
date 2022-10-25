@@ -1,29 +1,30 @@
-type Payload = Array<Data>
+export type Payload = Array<Data>;
 
-type Data = {
-lat : number,
-lon : number,
-name: string,
-}
+export type Data = {
+	lat: number;
+	lon: number;
+	name: string;
+};
 
-type ApiResponse = {
-lat : number,
-lon : number,
-name: string,
-impressions:number,
-clicks:number
-}
+export type Csv = {
+	lat: number;
+	lon: number;
+	event_type: string;
+};
 
-type City = string
+export type ApiResponse = {
+	lat: number;
+	lon: number;
+	name: string;
+	impressions: number;
+	clicks: number;
+};
 
+export type ResponseApi = {
+	Chatelet: ApiResponse;
+	Arc: ApiResponse;
+};
 
+export type Unit = 'K' | 'N';
 
-
-
-
-
-
-
-
-
-
+type City = 'Chatelet' | 'Arc';
