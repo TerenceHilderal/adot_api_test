@@ -2,8 +2,8 @@
 Adot Api Test 
 </h1>
 
-![](https://user-images.githubusercontent.com/56540121/132658868-c6a36962-c146-4dc3-bcb0-3399184f061a.png)
 
+![Capture](https://user-images.githubusercontent.com/56540121/198409223-dc88f2d3-36a0-4e61-98a5-46fd4b2a78a6.PNG)
 
 
 ```
