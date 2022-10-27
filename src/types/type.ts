@@ -36,5 +36,3 @@ export type ResponseInterestsPointClicks = {
 };
 
 export type Unit = 'K' | 'N';
-
-type City = 'Chatelet' | 'Arc';

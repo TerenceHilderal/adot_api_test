@@ -2,13 +2,12 @@ import csvParser from 'csv-parser';
 import path from 'path';
 import fs from 'fs';
 import { Csv, Payload, ResponseApi, ResponseInterestsPointImpressions, ResponseInterestsPointClicks, Unit } from '../types/type';
-import POI from '../data/points-of-interest.json';
 
 export class InterestPointService {
 	static loadEvents(): Promise<Array<Csv>> {
 		const eventsArray: Array<Csv> = [];
 		return new Promise((resolve, reject) => {
-			fs.createReadStream(path.join(__dirname, '../data/events-copy.csv'))
+			fs.createReadStream(path.join(__dirname, '../data/events.csv'))
 				.pipe(csvParser())
 				.on('data', (data: Csv) => eventsArray.push(data))
 				.on('error', (err) => {
@@ -24,11 +23,11 @@ export class InterestPointService {
 		if (lat1 == lat2 && lon1 == lon2) {
 			return 0;
 		} else {
-			var radlat1 = (Math.PI * lat1) / 180;
-			var radlat2 = (Math.PI * lat2) / 180;
-			var theta = lon1 - lon2;
-			var radtheta = (Math.PI * theta) / 180;
-			var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+			const radlat1 = (Math.PI * lat1) / 180;
+			const radlat2 = (Math.PI * lat2) / 180;
+			const theta = lon1 - lon2;
+			const radtheta = (Math.PI * theta) / 180;
+			let dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
 			if (dist > 1) {
 				dist = 1;
 			}
@@ -50,29 +49,26 @@ export class InterestPointService {
 		let chateletClicks = 0;
 		let arcClicks = 0;
 		let arcImps = 0;
-		const loadEvents = this.loadEvents().then((datas) => {
+		await this.loadEvents().then((datas) => {
 			for (const data of datas) {
 				({ chateletClicks, arcClicks } = InterestPointService.pointInterestClicks(data, chateletClicks, arcClicks));
 
 				({ chateletImps, arcImps } = InterestPointService.pointInterestImpressions(data, chateletImps, arcImps));
 			}
 		});
-		const loadResp = loadEvents.then((res) => {
-			return {
-				Chatelet: {
-					...dataR[0],
-					impressions: chateletImps,
-					clicks: chateletClicks,
-				},
-				Arc: {
-					...dataR[1],
-					impressions: arcImps,
-					clicks: arcClicks,
-				},
-			};
-		});
 
-		return loadResp;
+		return {
+			Chatelet: {
+				...dataR[0],
+				impressions: chateletImps,
+				clicks: chateletClicks,
+			},
+			Arc: {
+				...dataR[1],
+				impressions: arcImps,
+				clicks: arcClicks,
+			},
+		};
 	}
 
 	static pointInterestImpressions(data: Csv, chateletImps: number, arcImps: number): ResponseInterestsPointImpressions {
