@@ -25,6 +25,16 @@ export type ResponseApi = {
 	Arc: ApiResponse;
 };
 
+export type ResponseInterestsPointImpressions = {
+	chateletImps: number;
+	arcImps: number;
+};
+
+export type ResponseInterestsPointClicks = {
+	chateletClicks: number;
+	arcClicks: number;
+};
+
 export type Unit = 'K' | 'N';
 
 type City = 'Chatelet' | 'Arc';

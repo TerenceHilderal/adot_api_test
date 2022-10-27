@@ -1,7 +1,7 @@
 import csvParser from 'csv-parser';
 import path from 'path';
 import fs from 'fs';
-import { Csv, Unit } from '../types/type';
+import { Csv, Payload, ResponseApi, ResponseInterestsPointImpressions, ResponseInterestsPointClicks, Unit } from '../types/type';
 import POI from '../data/points-of-interest.json';
 
 export class InterestPointService {
@@ -20,13 +20,7 @@ export class InterestPointService {
 		});
 	}
 
-	static distanceBetweenInterestPointAndEvent(
-		lat1: number,
-		lon1: number,
-		lat2: number,
-		lon2: number,
-		unit: Unit,
-	): number {
+	static distanceBetweenInterestPointAndEvent(lat1: number, lon1: number, lat2: number, lon2: number, unit: Unit): number {
 		if (lat1 == lat2 && lon1 == lon2) {
 			return 0;
 		} else {
@@ -34,9 +28,7 @@ export class InterestPointService {
 			var radlat2 = (Math.PI * lat2) / 180;
 			var theta = lon1 - lon2;
 			var radtheta = (Math.PI * theta) / 180;
-			var dist =
-				Math.sin(radlat1) * Math.sin(radlat2) +
-				Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+			var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
 			if (dist > 1) {
 				dist = 1;
 			}
@@ -53,129 +45,63 @@ export class InterestPointService {
 		}
 	}
 
-	static eventsData() {
-		let chateletImp = 0;
-		let chateletClick = 0;
-		let arcClick = 0;
-		let arcImp = 0;
-		this.loadEvents().then((datas) => {
+	static async eventsData(dataR: Payload): Promise<ResponseApi> {
+		let chateletImps = 0;
+		let chateletClicks = 0;
+		let arcClicks = 0;
+		let arcImps = 0;
+		const loadEvents = this.loadEvents().then((datas) => {
 			for (const data of datas) {
-				({ chateletClick, arcClick } =
-					InterestPointService.pointInterestClicks(
-						data,
-						chateletClick,
-						arcClick,
-					));
+				({ chateletClicks, arcClicks } = InterestPointService.pointInterestClicks(data, chateletClicks, arcClicks));
 
-				({ chateletImp, arcImp } =
-					InterestPointService.pointInterestImpressions(
-						data,
-						chateletImp,
-						arcImp,
-					));
+				({ chateletImps, arcImps } = InterestPointService.pointInterestImpressions(data, chateletImps, arcImps));
 			}
 		});
-		return {
-			Chatelet: {
-				...POI[0],
-				impressions: chateletImp,
-				clicks: chateletClick,
-			},
-			Arc: {
-				...POI[1],
-				impressions: arcImp,
-				clicks: arcClick,
-			},
-		};
+		const loadResp = loadEvents.then((res) => {
+			return {
+				Chatelet: {
+					...dataR[0],
+					impressions: chateletImps,
+					clicks: chateletClicks,
+				},
+				Arc: {
+					...dataR[1],
+					impressions: arcImps,
+					clicks: arcClicks,
+				},
+			};
+		});
+
+		return loadResp;
 	}
 
-	private static pointInterestImpressions(
-		data: Csv,
-		chateletImp: number,
-		arcImp: number,
-	) {
+	static pointInterestImpressions(data: Csv, chateletImps: number, arcImps: number): ResponseInterestsPointImpressions {
 		if (
-			this.distanceBetweenInterestPointAndEvent(
-				48.86,
-				2.35,
-				data.lat,
-				data.lon,
-				'K',
-			) <
-				this.distanceBetweenInterestPointAndEvent(
-					48.8759992,
-					2.3481253,
-					data.lat,
-					data.lon,
-					'K',
-				) &&
+			this.distanceBetweenInterestPointAndEvent(48.86, 2.35, data.lat, data.lon, 'K') < this.distanceBetweenInterestPointAndEvent(48.8759992, 2.3481253, data.lat, data.lon, 'K') &&
 			data.event_type === 'imp'
 		) {
-			chateletImp++;
+			chateletImps++;
 		} else if (
-			this.distanceBetweenInterestPointAndEvent(
-				48.86,
-				2.35,
-				data.lat,
-				data.lon,
-				'K',
-			) >
-				this.distanceBetweenInterestPointAndEvent(
-					48.8759992,
-					2.3481253,
-					data.lat,
-					data.lon,
-					'K',
-				) &&
+			this.distanceBetweenInterestPointAndEvent(48.86, 2.35, data.lat, data.lon, 'K') > this.distanceBetweenInterestPointAndEvent(48.8759992, 2.3481253, data.lat, data.lon, 'K') &&
 			data.event_type === 'imp'
 		) {
-			arcImp++;
+			arcImps++;
 		}
-		return { chateletImp, arcImp };
+		return { chateletImps, arcImps };
 	}
 
-	private static pointInterestClicks(
-		data: Csv,
-		chateletClick: number,
-		arcClick: number,
-	) {
+	static pointInterestClicks(data: Csv, chateletClicks: number, arcClicks: number): ResponseInterestsPointClicks {
 		if (
-			this.distanceBetweenInterestPointAndEvent(
-				48.86,
-				2.35,
-				data.lat,
-				data.lon,
-				'K',
-			) <
-				this.distanceBetweenInterestPointAndEvent(
-					48.8759992,
-					2.3481253,
-					data.lat,
-					data.lon,
-					'K',
-				) &&
+			this.distanceBetweenInterestPointAndEvent(48.86, 2.35, data.lat, data.lon, 'K') < this.distanceBetweenInterestPointAndEvent(48.8759992, 2.3481253, data.lat, data.lon, 'K') &&
 			data.event_type === 'click'
 		) {
-			chateletClick++;
+			chateletClicks++;
 		} else if (
-			this.distanceBetweenInterestPointAndEvent(
-				48.86,
-				2.35,
-				data.lat,
-				data.lon,
-				'K',
-			) >
-				this.distanceBetweenInterestPointAndEvent(
-					48.8759992,
-					2.3481253,
-					data.lat,
-					data.lon,
-					'K',
-				) &&
+			this.distanceBetweenInterestPointAndEvent(48.86, 2.35, data.lat, data.lon, 'K') > this.distanceBetweenInterestPointAndEvent(48.8759992, 2.3481253, data.lat, data.lon, 'K') &&
 			data.event_type === 'click'
 		) {
-			arcClick++;
+			arcClicks++;
 		}
-		return { chateletClick, arcClick };
+		return { chateletClicks, arcClicks };
 	}
 }
