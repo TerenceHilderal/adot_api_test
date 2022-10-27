@@ -1,0 +1,77 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Adot ad link project",
+    "description": "Test technique backend",
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [{"url": "/swagger"}],
+  "tags": [
+    { "name": "Adot ad link project", "description": "API for inerest" }
+  ],
+  "paths": {
+    "/link": {
+      "post": {
+        "tags": ["Adot ad link project"],
+        "summary": " Calculate number of impressions and clicks and linked them based on the point of interest",
+        "requestBody": {
+          "description": "Create user",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/definitions/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Return the numbers of impressions and clicks based on point of interests"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "User": {
+      "type": "object",
+      "properties": {
+        "Chatelet": {
+        "lat": "48.8759992",
+        "lon": "2.3481253",
+        "name": "Arc de triomphe",
+        "impressions": "10",
+        "clicks": "1"
+    },
+    "Arc": {
+        "lat": "48.86",
+        "lon": "2.35",
+        "name": "Chatelet",
+        "impressions": "6",
+        "clicks": "2"
+    }
+      }
+    }
+  },
+  "User": {
+    "type": "object",
+    "properties": {
+      "user": {
+        "type": "object",
+        "additionnalProperties":{
+          "$ref": "#/definitions/User"
+        }
+      }
+    }
+  }
+}
+
+

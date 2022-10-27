@@ -3,9 +3,6 @@ import { InterestPointController } from '../controllers/InterestPointController'
 
 const interestPointRoute = Router();
 
-interestPointRoute.post(
-	'/interest',
-	InterestPointController.getClickAndImpressionsBasedOnInterestPointProximity,
-);
+interestPointRoute.post('/link', InterestPointController.getClickAndImpressionsBasedOnInterestPointProximity);
 
 export default interestPointRoute;
